@@ -10,7 +10,7 @@ class Config:
         os.path.abspath(__file__)), 'templates')
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
     APP = None
-    SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root:199718@172.17.0.1:3306/livro_flask'
+    SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://romulo:199718@localhost:3306/livro_flask'
 
 
 class DeveloperConfig(Config):

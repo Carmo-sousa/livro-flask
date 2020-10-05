@@ -1,8 +1,9 @@
 # -*- coding utf-8 -*-
 
-from flask_sqlalchemy import SQLAlchemy
-
 from config import app_active, app_config
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import relationship
+
 from model.Category import Category
 from model.User import User
 
@@ -38,3 +39,6 @@ class Product(db.Model):
         db.ForeignKey(Category.id),
         nullable=False
     )
+
+    usuario = relationship(User)
+    categoria = relationship(Category)

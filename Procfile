@@ -1,2 +1,2 @@
-worker: env FLASK_ENV=development
+worker: env FLASK_ENV=production
 web: python run.py

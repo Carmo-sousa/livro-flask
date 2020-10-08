@@ -1,5 +1,7 @@
 # -*- coding utf-8 -*-
 
+import re
+
 from config import app_active, app_config
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
@@ -19,26 +21,28 @@ class Product(db.Model):
     image = db.Column(db.Text(), nullable=True)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     date_created = db.Column(
-        db.DateTime(6),
-        default=db.func.current_timestamp(),
-        nullable=False
+        db.DateTime(6), default=db.func.current_timestamp(), nullable=False
     )
     last_update = db.Column(
-        db.DateTime(6),
-        default=db.func.current_timestamp(),
-        nullable=False
+        db.DateTime(6), default=db.func.current_timestamp(), nullable=False
     )
     status = db.Column(db.Boolean(), default=1, nullable=True)
     user_created = db.Column(
-        db.Integer,
-        db.ForeignKey(User.id),
-        nullable=False
-    )
-    category = db.Column(
-        db.Integer,
-        db.ForeignKey(Category.id),
-        nullable=False
-    )
+        db.Integer, db.ForeignKey(User.id), nullable=False)
+    category = db.Column(db.Integer, db.ForeignKey(
+        Category.id), nullable=False)
 
     usuario = relationship(User)
     categoria = relationship(Category)
+
+    def get_all(self):
+        try:
+            res = db.session.query(Product).all()
+
+        except Exception as e:
+            res = []
+            print(e)
+
+        finally:
+            db.session.close()
+            return res

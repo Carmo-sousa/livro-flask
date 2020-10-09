@@ -1,4 +1,4 @@
-#! -*- coding: utf-8 -*-
+# _*_ coding: utf-8 _*_
 
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView

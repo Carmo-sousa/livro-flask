@@ -1,11 +1,13 @@
-# -*- coding: utf-8 -*-
+# _*_ coding: utf-8 _*_
 
-# Config import
 from flask import Flask, redirect, render_template, request
+from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.util.langhelpers import bool_or_str
 
 from admin.Admin import start_views
 from config import app_active, app_config
+from controller.Product import ProductController
 from controller.User import UserController
 
 config = app_config[app_active]
@@ -18,7 +20,9 @@ def create_app(config_name):
     app.config.from_pyfile("config.py")
     app.config["SQLALCHEMY_DATABASE_URI"] = config.SQLALCHEMY_DATABASE_URI
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config['FLASK_ADMIN_SWATCH'] = 'paper'
+    app.config["FLASK_ADMIN_SWATCH"] = "paper"
+
+    Bootstrap(app)
 
     db = SQLAlchemy(config.APP)
     start_views(app, db)
@@ -29,16 +33,17 @@ def create_app(config_name):
     def index():
         return "Hello world!"
 
-    @app.route("/login/")
+    # Login
+    @app.route("/login")
     def login():
-        return "Aqui entrará a tela de login"
+        return render_template('login.html',
+                               message="Essa é uma mensagem que veio da rota")
 
-    @app.route("/login/", methods=["POST"])
+    @app.route("/login", methods=["POST"])
     def login_post():
         user = UserController()
         email = request.form["email"]
         password = request.form["password"]
-
         result = user.login(email, password)
 
         if result:
@@ -49,6 +54,24 @@ def create_app(config_name):
                 data={"status": 401, "msg": "Dados incorretos", "type": None},
             )
 
+    # Produtos
+    @app.route("/product", methods=["POST"])
+    def save_products():
+        product = ProductController()
+        result = product.save_product(request.form)
+        message = "Inserido" if result else "Não inserido"
+
+        return message
+
+    @app.route('/product', methods=['PUT'])
+    def update_products():
+        product = ProductController()
+        result = product.update_product(request.form)
+        message = "Editado" if result else "Não editado"
+
+        return message
+
+    # Recuperação de senha
     @app.route("/recovery-password/")
     def recovery_password():
         return "Aqui entrará a tela de recuperar senha"
@@ -56,7 +79,6 @@ def create_app(config_name):
     @app.route("/recovery-password/", methods=["POST"])
     def send_recovery_password():
         user = UserController()
-
         result = user.recovery(request.form["email"])
 
         if result:
@@ -64,9 +86,10 @@ def create_app(config_name):
                 "recovery.html",
                 data={
                     "status": 200,
-                    "msg": "E-mail de recuperação emviado com sucesso",
+                    "msg": "E-mail de recuperação enviado com sucesso",
                 },
             )
+
         else:
             return render_template(
                 "recovery.html",

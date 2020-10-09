@@ -11,16 +11,8 @@ class UserController:
 
         if result is not None:
             res = self.user_model.verify_password(password, result.password)
-
-            if res:
-                return result
-            else:
-                return {}
-
+            return result if res else {}
         return {}
 
-    @staticmethod
-    def recovery(email):
-        return ''
-
-
+    def recovery(self, email):
+        return ""

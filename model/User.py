@@ -4,6 +4,7 @@ from config import app_active, app_config
 from cryptography.fernet import Fernet
 from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256
+from sqlalchemy import func
 from sqlalchemy.orm import relationship
 
 from model.Role import Role
@@ -29,6 +30,18 @@ class User(db.Model):
 
     def __repr__(self):
         return "%s - %s" % (self.id, self.username)
+
+    def get_total_users(self):
+        try:
+            res = db.session.query(func.count(User.id)).first()
+
+        except Exception as e:
+            res = []
+            print(e)
+
+        finally:
+            db.session.close()
+            return res
 
     def get_user_by_email(self):
         return ""

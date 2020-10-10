@@ -3,14 +3,33 @@
 from config import app_active, app_config
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
+from model.Category import Category
+from model.Product import Product
+from model.User import User
 
 config = app_config[app_active]
 
 
 class HomeView(AdminIndexView):
+    extra_css = [config.URL_MAIN + '/static/css/home.css',
+                 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css']
+
     @expose('/')
     def index(self):
-        return self.render('home_admin.html', data={'username': 'Metatron'})
+        user_model = User()
+        product_model = Product()
+        category_model = Category()
+
+        users = user_model.get_total_users()
+        products = product_model.get_total_products()
+        categories = category_model.get_total_categories()
+        last_products = product_model.get_last_products()
+
+        return self.render('home_admin.html', report={
+            'users': 0 if not users else users[0],
+            'products': 0 if not products else products[0],
+            'categories': 0 if not categories else categories[0]
+        }, last_products=last_products)
 
 
 class UserView(ModelView):

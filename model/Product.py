@@ -2,6 +2,7 @@
 
 from config import app_active, app_config
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from sqlalchemy.orm import relationship
 
 from model.Category import Category
@@ -61,10 +62,34 @@ class Product(db.Model):
             res = db.session.query(Product).filter(
                 Product.id == self.id).update(obj)
             db.session.commit()
-
             return True
 
         except Exception as e:
             print(e)
             db.session.rollback()
             return False
+
+    def get_total_products(self):
+        try:
+            res = db.session.query(func.count(Product.id)).first()
+
+        except Exception as e:
+            res = []
+            print(e)
+
+        finally:
+            db.session.close()
+            return res
+
+    def get_last_products(self):
+        try:
+            res = db.session.query(Product).order_by(
+                Product.date_created).limit(5).all()
+
+        except Exception as e:
+            res = []
+            print(e)
+
+        finally:
+            db.session.close()
+            return res

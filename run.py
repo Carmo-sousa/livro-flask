@@ -1,7 +1,5 @@
 """
 Responsavel por rodar o programa
-
-Estou na branch developer
 """
 from app import create_app
 from config import app_active, app_config

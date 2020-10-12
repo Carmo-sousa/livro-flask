@@ -1,5 +1,5 @@
 """
-Responsável por rodar o programa
+Responsável por rodar o programa.
 """
 from app import create_app
 from config import app_active, app_config

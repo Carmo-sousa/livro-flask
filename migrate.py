@@ -8,14 +8,14 @@ from config import app_active, app_config
 config = app_config[app_active]
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = config.SQLALCHEMY_DATABASE_URI
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 manager = Manager(app)
-manager.add_command('db', MigrateCommand)
+manager.add_command("db", MigrateCommand)
 
 
 class Role(db.Model):
@@ -30,14 +30,11 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
 
     date_created = db.Column(
-        db.DateTime(6),
-        default=db.func.current_timestamp(),
-        nullable=False)
+        db.DateTime(6), default=db.func.current_timestamp(), nullable=False
+    )
 
     last_update = db.Column(
-        db.DateTime(6),
-        onupdate=db.func.current_timestamp(),
-        nullable=True
+        db.DateTime(6), onupdate=db.func.current_timestamp(), nullable=True
     )
     recovery_code = db.Column(db.String(200), nullable=True)
     active = db.Column(db.Boolean(), default=1, nullable=True)
@@ -58,27 +55,15 @@ class Product(db.Model):
     image = db.Column(db.Text(), nullable=True)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     date_created = db.Column(
-        db.DateTime(6),
-        default=db.func.current_timestamp(),
-        nullable=False
+        db.DateTime(6), default=db.func.current_timestamp(), nullable=False
     )
     last_update = db.Column(
-        db.DateTime(6),
-        default=db.func.current_timestamp(),
-        nullable=False
+        db.DateTime(6), default=db.func.current_timestamp(), nullable=False
     )
     status = db.Column(db.Boolean(), default=1, nullable=True)
-    user_created = db.Column(
-        db.Integer,
-        db.ForeignKey(User.id),
-        nullable=False
-    )
-    category = db.Column(
-        db.Integer,
-        db.ForeignKey(Category.id),
-        nullable=False
-    )
+    user_created = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
+    category = db.Column(db.Integer, db.ForeignKey(Category.id), nullable=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     manager.run()

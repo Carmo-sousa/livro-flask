@@ -26,17 +26,24 @@ class Product(db.Model):
         db.DateTime(6), default=db.func.current_timestamp(), nullable=False
     )
     status = db.Column(db.Boolean(), default=1, nullable=True)
-    user_created = db.Column(
-        db.Integer, db.ForeignKey(User.id), nullable=False)
-    category = db.Column(db.Integer, db.ForeignKey(
-        Category.id), nullable=False)
+    user_created = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
+    category = db.Column(db.Integer, db.ForeignKey(Category.id), nullable=False)
 
     usuario = relationship(User)
     categoria = relationship(Category)
 
-    def get_all(self):
+    def get_all(self, limit=None):
         try:
-            res = db.session.query(Product).all()
+            if limit is None:
+                res = db.session.query(Product).all()
+
+            else:
+                res = (
+                    db.session.query(Product)
+                    .order_by(Product.date_created)
+                    .limit(limit)
+                    .all()
+                )
 
         except Exception as e:
             res = []
@@ -59,8 +66,7 @@ class Product(db.Model):
 
     def update(self, obj):
         try:
-            res = db.session.query(Product).filter(
-                Product.id == self.id).update(obj)
+            res = db.session.query(Product).filter(Product.id == self.id).update(obj)
             db.session.commit()
             return True
 
@@ -83,11 +89,24 @@ class Product(db.Model):
 
     def get_last_products(self):
         try:
-            res = db.session.query(Product).order_by(
-                Product.date_created).limit(5).all()
+            res = (
+                db.session.query(Product).order_by(Product.date_created).limit(5).all()
+            )
 
         except Exception as e:
             res = []
+            print(e)
+
+        finally:
+            db.session.close()
+            return res
+
+    def get_product_by_id(self):
+        try:
+            res = db.session.query(Product).filter(Product.id == self.id).first()
+
+        except Exception as e:
+            res = None
             print(e)
 
         finally:

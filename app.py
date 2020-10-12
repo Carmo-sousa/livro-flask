@@ -1,9 +1,10 @@
 # _*_ coding: utf-8 _*_
 
-from flask import Flask, Response, json, redirect, render_template, request
+from functools import wraps
+
+from flask import Flask, Response, abort, json, redirect, render_template, request
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.util.langhelpers import bool_or_str
 
 from admin.Admin import start_views
 from config import app_active, app_config
@@ -38,6 +39,25 @@ def create_app(config_name):
         )
 
         return response
+
+    def auth_token_required(f):
+        @wraps(f)
+        def verify_token(*args, **kwargs):
+            user = UserController()
+
+            try:
+                result = user.verify_auth_token(request.headers["access_token"])
+
+                if result["status"] == 200:
+                    return f(*args, **kwargs)
+
+                else:
+                    abort(result["status"], result["message"])
+
+            except KeyError as e:
+                abort(401, "Você precisa enviar um token de acesso")
+
+        return verify_token
 
     @app.route("/")
     def index():

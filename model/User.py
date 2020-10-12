@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# _*_ coding: utf-8 _*_
 
 from config import app_active, app_config
 from cryptography.fernet import Fernet
@@ -46,7 +46,17 @@ class User(db.Model):
             return res
 
     def get_user_by_email(self):
-        return ""
+        try:
+            res = db.session.query(User).filter(
+                User.email == self.email).first()
+
+        except Exception as e:
+            res = None
+            print(e)
+
+        finally:
+            db.session.close()
+            return res
 
     def get_user_by_id(self):
         try:

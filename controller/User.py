@@ -1,4 +1,13 @@
+import base64
+import hashlib
+import json
+from datetime import datetime, timedelta
+
+import jwt
+from config import app_active, app_config
 from model.User import User
+
+config = app_config[app_active]
 
 
 class UserController:
@@ -38,3 +47,30 @@ class UserController:
 
         finally:
             return {"result": result, "status": status}
+
+    def verify_auth_token(self, access_token):
+        status = 401
+
+        try:
+            jwt.decode(access_token, config.SECRET, algorithm="HS256")
+            message = "Token válido"
+            status = 200
+
+        except jwt.ExpiredSignatureError:
+            message = "Token expirado, realize um novo login"
+
+        except:
+            message = "Token inválido"
+
+        return {"message": message, "status": status}
+
+    def generate_auth_token(self, data, exp=30, time_exp=False):
+        date_time = (
+            data["exp"] if time_exp else datetime.utcnow() + timedelta(minutes=exp)
+        )
+
+        dict_jwt = {"id": data["id"], "username": data["username"], "exp": date_time}
+
+        access_token = jwt.encode(dict_jwt, config.SECRET, algorithm="HS256")
+
+        return access_token

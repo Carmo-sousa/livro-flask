@@ -47,8 +47,7 @@ class User(db.Model):
 
     def get_user_by_email(self):
         try:
-            res = db.session.query(User).filter(
-                User.email == self.email).first()
+            res = db.session.query(User).filter(User.email == self.email).first()
 
         except Exception as e:
             res = None
